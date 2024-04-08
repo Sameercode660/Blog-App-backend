@@ -74,8 +74,34 @@ const myBlog = async (req, res) => {
     }
 }
 
+const getSingleBlog = async(req, res) => {
+    try {
+        
+        if(!req.body) {
+            return res.status(400).json({message: 'body is not found', status: false})
+        }
+
+        const {blogId}  = req.body
+
+        if(!blogId) {
+            return res.status(400).json({message: 'blog is not found', status: false})
+        }
+
+        const response = await Blog.findOne({_id: blogId}).populate({path: 'user', select:'-password'})
+
+        if(!response) {
+            return res.status(400).json({message: 'blog is not found', status: false})
+        }
+
+        return res.status(200).json({data: response, status: true})
+    } catch (error) {
+        console.log('Error in getSingleBlog controller: ', error)
+    }
+}
+
 export {
     postBLog,
     fetchBLog,
     myBlog,
+    getSingleBlog
 }
