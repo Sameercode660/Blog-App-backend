@@ -1,5 +1,6 @@
 import { Blog } from "../models/blog.model.js";
-
+import { upload } from "../middlewares/multer.middlewares.js";
+import { uploadOnCloudinary } from "../utils/Cloudinary.utils.js";
 
 const postBLog = async (req, res) => {
     try {
@@ -9,16 +10,25 @@ const postBLog = async (req, res) => {
         }
 
         const {user, title, description} = req.body;
+        const imagePath = req.files.image[0].path
 
-        console.log(user,title, description)
         if(!user || !title || !description) {
             return res.status(400).json({message: 'anyone field is empty', status: false})
         }
+        
+        console.log(user,title, description)
 
+        const image = await uploadOnCloudinary(imagePath)
+
+        console.log(image)
+        if(!image) {
+            console.log('Unable to upload the image')
+        }
         const data = {
             user,
             title,
-            description
+            description,
+            image: image.url
         }
 
         const response = await Blog.create(data)
